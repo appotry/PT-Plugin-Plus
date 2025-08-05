@@ -1,5 +1,5 @@
 <template>
-  <v-app id="inspire">
+  <v-app id="inspire" :dark="this.darkMode">
     <template v-if="initializing">
       <v-progress-linear :indeterminate="true" color="info" height="5" class="pa-0 ma-0"></v-progress-linear>
       <v-alert :value="true" type="info">
@@ -48,11 +48,20 @@ export default {
       baseColor: "amber",
       drawer: this.$store.state.options.navBarIsOpen,
       havePermissions: false,
-      initializing: true
+      initializing: true,
+      darkMode: false
     };
   },
   created() {
     // this.init();
+    if (localStorage.getItem('DarkMode'))
+      this.darkMode = localStorage.getItem('DarkMode') == 'true';
+  },
+  mounted() {
+    this.$root.$on("ToggleDarkMode",() => {
+      this.darkMode = !this.darkMode;
+      localStorage.setItem('DarkMode', this.darkMode);
+    });
   },
   watch: {
     drawer() {

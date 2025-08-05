@@ -7,69 +7,50 @@
   "tags": ["综合"],
   "schema": "UNIT3D",
   "host": "asiancinema.me",
-  "selectors": {
-    "userBaseInfo": {
-      "page": "/",
-      "fields": {
-        "name": {
-          "selector": ["a[href*='settings']:first"],
-          "attribute": "href",
-          "switchFilters": [
-            ["query.match(/users\\/(.+)\\/settings/)", "(query && query.length>=2)?(query[1]):''"],
-            ["query ? query.getQueryString('id'):''"]
-          ]
-        },
-        "uploaded": {
-          "selector": ["span[title='Upload']", "span[title='上传']"],
-          "filters": ["query.text().trim().replace(/,/g,'')", "(query && query.length>=1)?query.sizeToNumber():0"]
-        },
-        "downloaded": {
-          "selector": ["span[title='Download']", "span[title='下载']"],
-          "filters": ["query.text().trim().replace(/,/g,'')", "(query && query.length>=1)?query.sizeToNumber():0"]
-        },
-        "bonus": {
-          "selector": ["a[title='My Bonus Points']", "a[title='我的魔力']"],
-          "filters": ["query.text().trim().replace(/ /g,'')"]
-        },
-        "seeding": {
-          "selector": ["span[title='Seeding']", "span[title='做种']"],
-          "filters": ["query.text().trim().replace(/,|\\n/g,'')"]
-        }
-      }
-    },
-    "userExtendInfo": {
-      "page": "/users/$user.name$",
-      "fields": {
-        "seedingSize": {
-          "selector": ["table.table-condensed.table-striped.table-bordered:first td:contains('Seeding Size') + td"],
-          "filters": ["query.text().trim().replace(/,/g,'').sizeToNumber()"]
-        },
-        "levelName": {
-          "selector": "div.content span.badge-user"
-        },
-        "messageCount": {
-          "selector": [".point"],
-          "filters": ["query.length?'11':'0'"]
-        },
-        "joinTime": {
-          "selector": ["div.content h4:contains('Registration date')", "div.content h4:contains('注册日期')", "div.content h4:contains('註冊日期')"],
-          "filters": ["query.text().replace(/(Registration date|注册日期|註冊日期)/g, '').trim()", "dateTime(query).isValid()?dateTime(query).valueOf():query"]
-        }
-      }
-    },
-    "common": {
-	  "page": "/torrents/",
-      "merge": true,
-      "fields": {
-	    "size": {
-          "selector": ["td.col-sm-2:contains('Size') + td"],
-          "filters": ["query.text().replace(/,/g,'').match(/([\\d.]+ ?[ZEPTGMK]?i?B)/)", "(query && query.length>1)?(query[1]).sizeToNumber():0"]
-        },
-        "sayThanksButton": {
-          "selector": ["a.btn.btn-xs[data-original-title='Thank']"],
-          "filters": ["query"]
-        }
-      }
-    }
+  "levelRequirements": [{
+    "level": "1", 
+    "name": "Power User",
+    "interval": "1",
+    "uploaded": "1TB",
+    "privilege": ""
+  },{
+    "level": "2", 
+    "name": "Super User",
+    "interval": "2",
+    "uploaded": "5TB",
+    "privilege": ""
+  },{
+    "level": "3", 
+    "name": "Extreme User",
+    "interval": "3",
+    "uploaded": "20TB",
+    "privilege": ""
+  },{
+    "level": "4", 
+    "name": "Insane User",
+    "interval": "6",
+    "uploaded": "50TB",
+    "privilege": ""
+  },{
+    "level": "5", 
+    "name": "Veteran",
+    "interval": "12",
+    "uploaded": "100TB",
+    "privilege": "Special freeleech"
+  }],
+  "searchEntryConfig": {
+    "page": "/torrents/filter",
+    "resultType": "html",
+    "parseScriptFile": "/sites/asiancinema.me/getSearchResult.js",
+    "resultSelector": "div.table-responsive > table:first",
+    "queryString": "search=$key$&qty=100",
+    "area": [{
+      "name": "IMDB",
+      "keyAutoMatch": "^(tt\\d+)$",
+      "queryString": "imdb=$key$&qty=100",
+      "replaceKey": [
+        "tt", ""
+      ]
+    }]
   }
 }

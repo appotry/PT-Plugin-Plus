@@ -8,18 +8,9 @@
   "url": "https://hdf.world/",
   "collaborator": ["luckiestone"],
   "host": "hdf.world",
-  "plugins": [{
-    "name": "种子列表",
-    "pages": ["/torrents.php"],
-    "scripts": ["/schemas/NexusPHP/common.js", "/schemas/Gazelle/torrents.js"]
-  }],
   "securityKeyFields": ["authkey", "torrent_pass"],
   "searchEntryConfig": {
-    "page": "/ajax.php",
-    "resultType": "json",
-    "parseScriptFile": "getSearchResult.js",
-    "asyncParse": true,
-    "queryString": "action=browse&searchstr=$key$"
+	"skipIMDbId": true
   },
   "searchEntry": [{
     "name": "all",
@@ -79,5 +70,8 @@
         }
       }
     }
+  },
+  "supportedFeatures": {
+    "imdbSearch": false
   }
 }

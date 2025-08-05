@@ -75,14 +75,14 @@
       if (site.url.lastIndexOf("/") != site.url.length - 1) {
         site.url += "/";
       }
-
+      //2023.5.10 fix byr.pt 不显示数据，下列div.icons.*是为了单独适配
       // 获取字段所在的列
       for (let index = 0; index < header.length; index++) {
         let cell = header.eq(index);
         let text = cell.text();
 
         // 评论数
-        if (cell.find("img.comments").length) {
+        if (cell.find(".comments").length) {
           fieldIndex.comments = index;
           fieldIndex.author =
             index == fieldIndex.author ? -1 : fieldIndex.author;
@@ -90,7 +90,7 @@
         }
 
         // 发布时间
-        if (cell.find("img.time").length) {
+        if (cell.find("img.time,div.date,div.icons.time").length) {
           fieldIndex.time = index;
           fieldIndex.author =
             index == fieldIndex.author ? -1 : fieldIndex.author;
@@ -98,7 +98,7 @@
         }
 
         // 大小
-        if (cell.find("img.size").length) {
+        if (cell.find("img.size,div[alt='size'],div.icons.size").length) {
           fieldIndex.size = index;
           fieldIndex.author =
             index == fieldIndex.author ? -1 : fieldIndex.author;
@@ -106,7 +106,7 @@
         }
 
         // 种子数
-        if (cell.find("img.seeders").length) {
+        if (cell.find("img.seeders,div[alt='seeders'],div.icons.seeders").length) {
           fieldIndex.seeders = index;
           fieldIndex.author =
             index == fieldIndex.author ? -1 : fieldIndex.author;
@@ -114,7 +114,7 @@
         }
 
         // 下载数
-        if (cell.find("img.leechers").length) {
+        if (cell.find("img.leechers,div[alt='leechers'],div.icons.leechers").length) {
           fieldIndex.leechers = index;
           fieldIndex.author =
             index == fieldIndex.author ? -1 : fieldIndex.author;
@@ -122,7 +122,7 @@
         }
 
         // 完成数
-        if (cell.find("img.snatched").length) {
+        if (cell.find("img.snatched,div[alt='snatched'],div.icons.snatched").length) {
           fieldIndex.completed = index;
           fieldIndex.author =
             index == fieldIndex.author ? -1 : fieldIndex.author;
@@ -147,12 +147,12 @@
         for (let index = beginRowIndex; index < rows.length; index++) {
           const row = rows.eq(index);
 
-          // FIX https://github.com/ronggang/PT-Plugin-Plus/issues/347
+          // FIX https://github.com/pt-plugins/PT-Plugin-Plus/issues/347
           row.attr('id') === 'zhiding' && row.removeAttr('id');
 
           let cells = row.find(">td");
 
-          let title = this.getTitle(row);
+          let title = this.getTitle(row, cells, fieldIndex);
 
           // 没有获取标题时，继续下一个
           if (title.length == 0) {
@@ -167,7 +167,7 @@
           }
 
           // 获取下载链接
-          let url = this.getDownloadLink(row,link);
+          let url = this.getDownloadLink(row, link);
           if (url && url.substr(0, 2) === "//") {
             // 适配HUDBT、WHU这样以相对链接开头
             url = `${site_url_help.protocol}://${url}`;
@@ -208,8 +208,9 @@
                 ? null
                 : this.getFieldValue(row, cells, fieldIndex, "category") ||
                 this.getCategory(cells.eq(fieldIndex.category)),
-            progress: this.getFieldValue(row, cells, fieldIndex, "progress"),
-            status: this.getFieldValue(row, cells, fieldIndex, "status")
+            progress: Searcher.getFieldValue(site, row, "progress"),
+            status: Searcher.getFieldValue(site, row, "status"),
+            imdbId: this.getIMDbId(row)
           };
 
           results.push(data);
@@ -269,7 +270,7 @@
       if (options.site.host === "pt.sjtu.edu.cn") {
         if (time.match(/\d+[分时天月年]/g)) {
           time = Date.now() - this._parseTime(time)
-          time = new Date(time).toLocaleString("zh-CN", {hour12: false}).replace(/\//g, '-')
+          time = new Date(time).toLocaleString("zh-CN", { hour12: false }).replace(/\//g, '-')
         }
       }
       return time || "";
@@ -307,10 +308,10 @@
     /**
      * 获取标题
      */
-    getTitle(row) {
+    getTitle(row, cells, fieldIndex) {
       let title =
-        Searcher.getFieldValue(this.site, row, "title") ||
-        row.find("a[href*='hit'][title]").first();
+        this.getFieldValue(row, cells, fieldIndex, "title", true) ||
+        row.find("a[href*='hit'][title]:not(a[href*='comment'])").first();
 
       if (typeof title === "string") {
         return title;
@@ -338,6 +339,32 @@
       }
 
       return title;
+    }
+
+    /**
+     * 获取IMDbId
+     * @param {*} row
+     */
+    getIMDbId(row)
+    {
+      let imdbId = Searcher.getFieldValue(this.site, row, "imdbId");
+      if (imdbId) {
+        return imdbId;
+      }
+
+      try {
+        let link = row.find("a[href*='imdb.com/title/tt']").first().attr("href");
+        if (link)
+        {
+          imdbId = link.match(/(tt\d+)/);
+          if (imdbId)
+            return imdbId[0];
+        }
+      } catch (error){
+        console.log(error)
+        return null;
+      }
+      return null;
     }
 
     /**
@@ -419,10 +446,11 @@
       switch (options.site.host) {
         case 'hdsky.me': {
           let url_another = row.find('form[action*="download.php"]:eq(0)')
-          if (url_another) {
+          if (url_another.length > 0) {
             url = url_another.attr('action')
+            break;
           }
-          break;
+
         }
 
         default: {

@@ -3,7 +3,7 @@
   "timezoneOffset": "+0000",
   "description": "",
   "icon": "https://www.morethantv.me/favicon.ico",
-  "schema": "Luminance",
+  "schema": "Common",
   "tags": ["电视剧", "剧集"],
   "url": "https://www.morethantv.me",
   "collaborator": "luckiestone",
@@ -11,9 +11,70 @@
   "formerHosts": [
     "www.morethan.tv"
   ],
-  "supportedFeatures": {
-    "search": false,
-    "imdbSearch": false
+  "plugins": [{
+    "name": "种子详情页面",
+    "pages": ["/torrents.php"],
+    "scripts": ["/schemas/NexusPHP/common.js", "/schemas/Common/torrents.js"]
+  }, {
+    "name": "种子列表",
+    "pages": ["/torrents/browse", "/show/(\\d+)/$","/collages.php"],
+    "scripts": ["/schemas/NexusPHP/common.js", "/schemas/Common/torrents.js"]
+  }],
+  "searchEntry": [{
+    "name": "全部",
+    "enabled": true
+  }],
+  "searchEntryConfig": {
+    "page": "torrents/browse?searchtext=$key$",
+    "name": "全部",
+    "resultType": "html",
+    "resultSelector": "table.torrent_table",
+    "dataRowSelector": "> tbody > tr:not(:first-child)",
+    "fieldIndex": {
+	    "title": 1,
+	    "link": 1,
+	    "url": 1,
+        "time": 3,
+        "size": 4,
+        "author": 8,
+        "seeders": 6,
+        "leechers": 7,
+        "completed": 5
+    },
+    "fieldSelector": {
+      "title": {
+          "selector": ["a.overlay_torrent"],
+          "filters": ["query.text()"]
+      },
+      "link": {
+          "selector": ["a.overlay_torrent"],
+          "filters": ["query.attr('href')", "'https://www.morethantv.me/'+query"]
+      },
+      "url": {
+          "selector": ["a[href*='torrents.php?action=download']"],
+          "filters": ["query.attr('href')", "'https://www.morethantv.me/'+query"]
+      },
+      "time": {
+          "selector": ["span.time"],
+          "filters": ["dateTime(query.attr('title')).isValid() ? query.attr('title') : query.text()", "dateTime(query).format()"]
+      },
+      "progress": {
+        "selector": ["a[title='Currently Seeding Torrent'], a[title='Previously Snatched Torrent']", "a[title='Previously Grabbed Torrent File']"],
+        "switchFilters": [
+          ["(query && query.length > 0)?100:null"],
+          ["(query && query.length > 0)?0:null"],
+          [null]
+        ]
+      },
+      "status": {
+        "selector": ["a[title='Currently Seeding Torrent']", "a[title='Previously Snatched Torrent']", "a[title='Previously Grabbed Torrent File']"],
+        "switchFilters": [
+          [2],
+          [255],
+          [3]
+        ]
+      }
+    }
   },
   "selectors": {
     "userBaseInfo": {
@@ -43,19 +104,19 @@
       "fields": {
         "uploaded": {
           "selector": "ul.stats > li:contains('Uploaded')",
-          "filters": ["query.text().replace(/,/g,'').match(/Uploaded.+?([\\d.]+ ?[ZEPTGMK]?i?B)/)", "(query && query.length>=2)?(query[1]).sizeToNumber():0"]
+          "filters": ["query.text().replace(/,/g,'').match(/Uploaded.+?([\\d.]+ ?[ZEPTGMK]?i?B)/)", "(query && query.length>=2)?(query[1]).sizeToNumber():null"]
         },
         "downloaded": {
           "selector": "ul.stats > li:contains('Downloaded')",
-          "filters": ["query.text().replace(/,/g,'').match(/Downloaded.+?([\\d.]+ ?[ZEPTGMK]?i?B)/)", "(query && query.length>=2)?(query[1]).sizeToNumber():0"]
+          "filters": ["query.text().replace(/,/g,'').match(/Downloaded.+?([\\d.]+ ?[ZEPTGMK]?i?B)/)", "(query && query.length>=2)?(query[1]).sizeToNumber():null"]
         },
         "ratio": {
           "selector": "ul.stats > li:contains('Ratio:')",
-          "filters": ["query.text().replace(/,/g,'').match(/Ratio.+?([\\d.]+)/)", "(query && query.length>=2)?query[1]:0"]
+          "filters": ["query.text().replace(/,/g,'').match(/Ratio.+?([\\d.]+)/)", "(query && query.length>=2)?query[1]:null"]
         },
         "seeding": {
           "selector": ["ul.stats > li:contains('Seeding:')"],
-          "filters": [ "query.text().replace(/,/g, '').match(/Seeding:.+?([\\d]+)/)", "(query && query.length>=2)?query[1]:0" ]
+          "filters": [ "query.text().replace(/,/g, '').match(/Seeding:.+?([\\d]+)/)", "(query && query.length>=2)?query[1]:null" ]
         },
         "seedingSize": {
           "selector": ["ul.stats > li:contains('Seeding Size:')"],
@@ -69,9 +130,34 @@
           "selector": "#stats_credits",
           "filters": ["query.text()"]
         },
+        "bonusPerHour": {
+          "selector": ["ul.stats > li:contains('Seeding:')"],
+          "filters": [ "query.text().replace(/,/g, '').match(/Seeding:.+?([\\d]+)/)", "(query && query.length>=2)? parseInt(query[1]) : 0", "(query >= 300) ? 100 : Math.round((Math.sqrt(query*0.4+1)-1)*10)"]
+        },
         "joinTime": {
           "selector": ["ul.stats > li:contains('Joined:') > span"],
-          "filters": ["query.attr('title')||query.text()", "dateTime(query).isValid()?dateTime(query).valueOf():query"]
+          "filters": ["dateTime(query.attr('title')).isValid() ? query.attr('title') : query.text()", "dateTime(query).isValid() ? dateTime(query).valueOf() : query"]
+        }
+      }
+    },
+    "common": {
+	  "page": "/torrents.php",
+      "fields": {
+        "downloadURL": {
+          "selector": ["tr[id*='torrentinfo'][class!='hidden']"],
+          "filters": ["query.prev().find(\"a[href*='action=download']\").attr('href')"]
+        },
+        "size": {
+          "selector": ["tr.group_torrent > td.nobr"],
+          "filters": ["query.text().replace(/,/g,'').match(/([\\d.]+ ?[ZEPTGMK]?i?B)/)", "(query && query.length>1)?(query[1]).sizeToNumber():0"]
+        },
+        "downloadURLs": {
+          "selector": ["tr.group_torrent a[href*='action=download']"],
+          "filters": ["query.toArray()"]
+        },
+        "confirmSize": {
+          "selector": ["tr.group_torrent > td.nobr"],
+          "filters": ["query.toArray()"]
         }
       }
     }

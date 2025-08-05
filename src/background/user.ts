@@ -130,7 +130,7 @@ export class User {
 
           if (!userInfo.isLogged) {
             userInfo.lastUpdateStatus = EUserDataRequestStatus.needLogin;
-            this.updateStatus(site, userInfo);
+            //this.updateStatus(site, userInfo);
 
             rejectFN(
               APP.createErrorMessage({
@@ -152,14 +152,16 @@ export class User {
           if (userInfo.name || userInfo.id) {
             let url = `${this.getSiteURL(site)}${rule.page
               .replace("$user.id$", userInfo.id)
-              .replace("$user.name$", userInfo.name)}`;
+              .replace("$user.name$", userInfo.name)
+              .replace("$user.bonusPage$", userInfo.bonusPage)
+              .replace("$user.unsatisfiedsPage$", userInfo.unsatisfiedsPage)}`;
             // 上次请求未完成时，直接返回最近的数据
             if (this.checkQueue(host, url)) {
               resolve(userInfo);
               return;
             }
 
-            this.getInfos(host, url, rule)
+            this.getInfos(host, url, rule, site, userInfo)
               .then((result: any) => {
                 userInfo = Object.assign(userInfo, result);
 
@@ -171,12 +173,12 @@ export class User {
               })
               .catch((error: any) => {
                 userInfo.lastUpdateStatus = EUserDataRequestStatus.unknown;
-                this.updateStatus(site, userInfo);
+                //this.updateStatus(site, userInfo);
                 rejectFN(APP.createErrorMessage(error));
               });
           } else {
             userInfo.lastUpdateStatus = EUserDataRequestStatus.unknown;
-            this.updateStatus(site, userInfo);
+            //this.updateStatus(site, userInfo);
             rejectFN(
               APP.createErrorMessage({
                 status: EUserDataRequestStatus.unknown,
@@ -187,7 +189,8 @@ export class User {
         })
         .catch((error: any) => {
           userInfo.lastUpdateStatus = EUserDataRequestStatus.unknown;
-          this.updateStatus(site, userInfo);
+          console.log("getInfos Error :",error);
+          //this.updateStatus(site, userInfo);
           rejectFN(APP.createErrorMessage(error));
         });
     });
@@ -201,7 +204,7 @@ export class User {
   public getMoreInfos(site: Site, userInfo: UserInfo): Promise<any> {
     return new Promise<any>((resolve?: any, reject?: any) => {
       let requests: any[] = [];
-      let selectors = ["userSeedingTorrents"];
+      let selectors = ["userSeedingTorrents", "bonusExtendInfo", "hnrExtendInfo", "levelExtendInfo", "userUploadedTorrents"];
 
       selectors.forEach((name: string) => {
         let host = site.host as string;
@@ -210,7 +213,9 @@ export class User {
         if (rule) {
           let url = `${this.getSiteURL(site)}${rule.page
             .replace("$user.id$", userInfo.id)
-            .replace("$user.name$", userInfo.name)}`;
+            .replace("$user.name$", userInfo.name)
+            .replace("$user.bonusPage$", userInfo.bonusPage)
+            .replace("$user.unsatisfiedsPage$", userInfo.unsatisfiedsPage)}`;
           // 上次请求未完成时，跳过
           if (this.checkQueue(host, url)) {
             return;
@@ -279,6 +284,19 @@ export class User {
             if (requestData.hasOwnProperty(key)) {
               const value = requestData[key];
               requestData[key] = PPF.replaceKeys(value, userInfo, "user");
+            }
+          }
+        } catch (error) {
+          console.log(error);
+        }
+      }
+      let headers = rule.headers;
+      if (headers && userInfo) {
+        try {
+          for (const key in headers) {
+            if (headers.hasOwnProperty(key)) {
+              const value = headers[key];
+              headers[key] = PPF.replaceKeys(value, userInfo, "user");
             }
           }
         } catch (error) {

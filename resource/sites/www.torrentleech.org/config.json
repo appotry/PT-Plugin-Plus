@@ -7,6 +7,40 @@
   "tags": ["综合"],
   "schema": "TorrentLeech",
   "host": "www.torrentleech.org",
+  "levelRequirements": [
+    {
+      "level": 1,
+      "name": "Power User",
+      "interval": "2",
+      "uploaded": "200GB",
+      "ratio": "1.1",
+      "privilege": "Increased Points: 3%, Minimum Seeding Time: 8 days"
+    },
+    {
+      "level": 2,
+      "name": "Super User",
+      "interval": "12",
+      "uploaded": "1TB",
+      "ratio": "2.0",
+      "privilege": "Increased Points: 5%, Minimum Seeding Time: 7 days"
+    },
+    {
+      "level": 3,
+      "name": "Extreme User",
+      "interval": "24",
+      "uploaded": "10TB",
+      "ratio": "5.0",
+      "privilege": "Increased Points: 6%, Minimum Seeding Time: 6 days"
+    },
+    {
+      "level": 4,
+      "name": "TL GOD",
+      "interval": "52",
+      "uploaded": "50TB",
+      "ratio": "8.0",
+      "privilege": "Increased Points: 8%, Minimum Seeding Time: 4 days"
+    }
+  ],
   "plugins": [{
     "name": "种子详情页面",
     "pages": ["^/torrent/(\\d+)$"],
@@ -42,19 +76,19 @@
         },
         "uploaded": {
           "selector": ["span.centerTopBar div[title^='Uploaded'] span"],
-          "filters": ["query.text().trim().replace(/,/g,'').sizeToNumber()"]
+          "filters": ["query.text()?query.text().trim().replace(/,/g,'').sizeToNumber():null"]
         },
         "downloaded": {
           "selector": ["span.centerTopBar div[title^='Downloaded'] span"],
-          "filters": ["query.text().trim().replace(/,/g,'').sizeToNumber()"]
+          "filters": ["query.text()?query.text().trim().replace(/,/g,'').sizeToNumber():null"]
         },
         "bonus": {
           "selector": ["span.centerTopBar span.total-TL-points"],
           "filters": ["query.text().replace(/,/g,'')"]
         },
         "messageCount": {
-          "selector": ["a[href='/content/articles'] i.news-notify"],
-          "filters": ["query.length>0 ? 255: 0"]
+          "selector": ["span.link[onclick*='/notifications']"],
+          "filters": ["parseInt(query.text().trim())"]
         }
       }
     },

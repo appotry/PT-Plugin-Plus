@@ -12,6 +12,14 @@ export enum ESizeUnit {
 }
 
 /**
+ * 数据请求类型
+ */
+export enum ERequestType {
+  JSON = "json",
+  TEXT = "urlencode"
+}
+
+/**
  * 数据请求返回类型
  */
 export enum ERequestResultType {
@@ -390,7 +398,7 @@ export enum EPluginPosition {
  * 相关Wiki链接
  */
 export enum EWikiLink {
-  faq = "https://github.com/ronggang/PT-Plugin-Plus/wiki/frequently-asked-questions"
+  faq = "https://github.com/pt-plugins/PT-Plugin-Plus/wiki/frequently-asked-questions"
 }
 
 /**

@@ -16,6 +16,16 @@
     "pages": ["/browse.php"],
     "scripts": ["/schemas/NexusPHP/common.js", "browse.js"]
   }],
+  "levelRequirements": [
+    {
+      "level": "1",
+      "name": "Power User",
+      "interval": "8",
+      "uploaded": "100GB",
+      "ratio": "1.1",
+      "privilege": "More download slots"
+    }
+  ],
   "searchEntryConfig": {
     "page": "/browse.php",
     "resultType": "html",
@@ -60,11 +70,11 @@
         },
         "uploaded": {
           "selector": ["#user-default td.rowhead:contains('Uploaded') + td"],
-          "filters": ["query.text().replace(/,/g,'').match(/([\\d.]+ ?[ZEPTGMK]?i?B)/)", "(query && query.length>=2)?(query[1]).sizeToNumber():0"]
+          "filters": ["query.text().replace(/,/g,'').match(/([\\d.]+ ?[ZEPTGMK]?i?B)/)", "(query && query.length>=2)?(query[1]).sizeToNumber():null"]
         },
         "downloaded": {
           "selector": ["#user-default td.rowhead:contains('Downloaded') + td"],
-          "filters": ["query.text().replace(/,/g,'').match(/([\\d.]+ ?[ZEPTGMK]?i?B)/)", "(query && query.length>=2)?(query[1]).sizeToNumber():0"]
+          "filters": ["query.text().replace(/,/g,'').match(/([\\d.]+ ?[ZEPTGMK]?i?B)/)", "(query && query.length>=2)?(query[1]).sizeToNumber():null"]
         },
         "levelName": {
           "selector": "#user-default td.rowhead:contains('Class') + td"

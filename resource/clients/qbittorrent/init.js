@@ -169,6 +169,14 @@
         formData.append("paused", !data.autoStart);
       }
 
+      if (data.imdbId != undefined) {
+        formData.append("tags", data.imdbId);
+      }
+
+      if (data.upLoadLimit && data.upLoadLimit > 0) {
+        formData.append("upLimit", data.upLoadLimit * 1024);
+      }
+
       let url = data.url;
 
       // 磁性连接

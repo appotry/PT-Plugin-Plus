@@ -64,7 +64,7 @@
             <v-timeline-item v-for="(site, i) in datas" :key="i" color="transparent" large>
               <template v-slot:icon>
                 <v-avatar size="38">
-                  <img :src="site.icon" :class="{'icon-blur': blurSiteIcon}"/>
+                  <img v-if="site.icon" :src="site.icon" :class="{'icon-blur': blurSiteIcon}"/>
                 </v-avatar>
               </template>
               <template v-slot:opposite>
@@ -72,16 +72,18 @@
                 <div class="caption">
                   <span v-if="showUserName" class="mr-2">{{ site.user.name }}</span>
                   <span v-if="showUserLevel">&lt;{{ site.user.levelName }}&gt;</span>
+                  <span v-if="site.user.id && site.user.id.length > 0 && showUid">&lt;{{ site.user.id }}&gt;</span>
                 </div>
               </template>
               <div>
                 <v-divider v-if="i>0" class="mb-2"></v-divider>
                 <div class="headline font-weight-light mb-2" v-if="showSiteName">{{ site.name }}</div>
-                <div>{{ $t('timeline.user.uploaded') }}{{ site.user.uploaded | formatSize }}</div>
+                <div>{{ $t('timeline.user.uploaded') }}{{ site.user.uploaded | formatSize}}</div>
                 <div>{{ $t('timeline.user.downloaded') }}{{ site.user.downloaded | formatSize }}</div>
                 <div>{{ $t('timeline.user.ratio') }}{{ site.user.ratio | formatRatio }}</div>
                 <div>{{ $t('timeline.user.seedingSize') }}{{ site.user.seedingSize | formatSize }} ({{ site.user.seeding }})</div>
                 <div>{{ $t('timeline.user.bonus') }}{{ site.user.bonus | formatNumber }}</div>
+                <div v-if="site.user.bonusPerHour && site.user.bonusPerHour != 'N/A'">{{ $t('timeline.user.bonusPerHour') }}{{ site.user.bonusPerHour | formatNumber }}</div>
               </div>
             </v-timeline-item>
           </v-timeline>
@@ -120,6 +122,12 @@
         :label="$t('timeline.userLevel')"
         class="my-0"
       ></v-switch>
+      <v-switch
+        color="success"
+        v-model="showUid"
+        :label="$t('timeline.userId')"
+        class="my-0"
+      ></v-switch>
       <v-divider />
       <h1 style="padding: 5px;">{{ $t('timeline.showSites') }}</h1>
       <v-layout justify-start row wrap>
@@ -145,6 +153,7 @@ import FileSaver from "file-saver";
 import domtoimage from 'dom-to-image';
 import Extension from "@/service/extension";
 import dayjs from "dayjs";
+import { PPF } from "@/service/public";
 
 const extension = new Extension();
 
@@ -184,9 +193,10 @@ export default Vue.extend({
       shareTime: new Date(),
       shareing: false,
       showUserName: true,
-      showSiteName: true,
+      showSiteName: false,
       showUserLevel: true,
-      blurSiteIcon: false,
+      showUid: true,
+      blurSiteIcon: true,
       iconCache: {} as Dictionary<any>
     };
   },
@@ -242,9 +252,11 @@ export default Vue.extend({
         if (!this.showSites.includes(site.name)) {
           return;
         }
-
+ 
         let user = site.user;
         if (user && user.name && user.joinTime) {
+          user.joinTime = PPF.transformTime(user.joinTime, site.timezoneOffset);  //add by pxwang for gpw jointime error
+          
           sites.push(site);
           if (!userNames[user.name]) {
             userNames[user.name] = 0;
@@ -288,7 +300,6 @@ export default Vue.extend({
               result.maxSeedingInfo.site = site;
             }
           }
-
           user.ratio = this.getRatio(user);
         }
       });
@@ -304,6 +315,7 @@ export default Vue.extend({
 
       // 按加入时间排序
       this.datas = sites.sort((a, b) => {
+        
         if (!a.user || !b.user) {
           return 0;
         }

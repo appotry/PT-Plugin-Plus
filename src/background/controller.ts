@@ -215,7 +215,7 @@ export default class Controller {
       let siteDefaultPath = this.getSiteDefaultPath(site);
       let siteClientConfig = this.siteDefaultClients[host];
 
-      // https://github.com/ronggang/PT-Plugin-Plus/issues/681
+      // https://github.com/pt-plugins/PT-Plugin-Plus/issues/681
       // 在 downloadOptions 中已经有 savePath 的情况下，不覆盖 savePath
       if (!downloadOptions.savePath && siteDefaultPath) {
         downloadOptions.savePath = siteDefaultPath;
@@ -255,6 +255,10 @@ export default class Controller {
     downloadOptions: DownloadOptions,
     host: string = ""
   ): Promise<any> {
+    // copy from sendTorrentToDefaultClient
+    let URL = Filters.parseURL(downloadOptions.url);
+    let downloadHost = URL.host;
+    let siteConfig = this.getSiteFromHost(downloadHost);
     return new Promise((resolve?: any, reject?: any) => {
       clientConfig.client
         .call(EAction.addTorrentFromURL, {
@@ -263,7 +267,9 @@ export default class Controller {
           autoStart:
             downloadOptions.autoStart === undefined
               ? false
-              : downloadOptions.autoStart
+              : downloadOptions.autoStart,
+          imdbId: downloadOptions.tagIMDb ? downloadOptions.imdbId : null,
+          upLoadLimit: siteConfig !== undefined ? siteConfig.upLoadLimit : null,
         })
         .then((result: any) => {
           this.service.logger.add({
@@ -512,7 +518,7 @@ export default class Controller {
         type: EDataResultType.success,
         msg:
           this.service.i18n.t("service.controller.torrentAdded", {
-            name: downloadOptions.title
+            title: downloadOptions.title
           }) +
           (downloadOptions.savePath
             ? this.service.i18n.t("service.controller.torrentSavePath", {
@@ -926,7 +932,8 @@ export default class Controller {
               if (options.parseTorrent) {
                 resolve({
                   url,
-                  torrent
+                  torrent,
+                  content: file.content
                 });
               } else {
                 resolve(file.content);

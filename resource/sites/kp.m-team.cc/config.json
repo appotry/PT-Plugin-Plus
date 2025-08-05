@@ -7,6 +7,63 @@
   "tags": ["影视", "综合","Adult"],
   "schema": "NexusPHP",
   "host": "kp.m-team.cc",
+  "levelRequirements": [{
+    "level": "1",
+    "name": "Power User",
+    "interval": "4",
+    "downloaded": "200GB",
+    "ratio": "2",
+    "privilege": "魔力值加成：+1%；可以使用匿名發表候選種子；可以上傳字幕"
+  },{
+    "level": "2",
+    "name": "Elite User",
+    "interval": "8",
+    "downloaded": "400GB",
+    "ratio": "3",
+    "privilege": "魔力值加成：+2%；可以發送邀請；可以管理自己上傳的字幕；可以檢視別人的下載紀錄（當對方的隱私權設定不為強才會生效）；可以使用個性條"
+  },{
+    "level": "3",
+    "name": "Crazy User",
+    "interval": "12",
+    "downloaded": "500GB",
+    "ratio": "4",
+    "privilege": "魔力值加成：+3%"
+  },{
+    "level": "4",
+    "name": "Insane User",
+    "interval": "16",
+    "downloaded": "800GB",
+    "ratio": "5",
+    "privilege": "魔力值加成：+4%；可以檢視排行榜"
+  },{
+    "level": "5",
+    "name": "Veteran User",
+    "interval": "20",
+    "downloaded": "1000GB",
+    "ratio": "6",
+    "privilege": "魔力值加成：+5%"
+  },{
+    "level": "6",
+    "name": "Extreme User",
+    "interval": "24",
+    "downloaded": "2000GB",
+    "ratio": "7",
+    "privilege": "魔力值加成：+6%"
+  },{
+    "level": "7",
+    "name": "Ultimate User",
+    "interval": "28",
+    "downloaded": "2500GB",
+    "ratio": "8",
+    "privilege": "魔力值加成：+7%"
+  },{
+    "level": "8",
+    "name": "Nexus Master",
+    "interval": "32",
+    "downloaded": "3000GB",
+    "ratio": "9",
+    "privilege": "魔力值加成：+8%"
+  }],
   "formerHosts": [
     "pt.m-team.cc",
     "tp.m-team.cc"
@@ -208,6 +265,19 @@
         "seedingSize": {
           "selector": ["tr:not(:eq(0))"],
           "filters": ["jQuery.map(query.find('td.rowfollow:eq(2)'), (item)=>{return $(item).text();})", "_self.getTotalSize(query)"]
+        }
+      }
+    },
+    "bonusExtendInfo": {
+      "prerequisites": "!user.bonusPerHour",
+      "page": "/mybonus.php",
+      "fields": {
+        "bonusPerHour": {
+          "selector": ["td:contains('您目前每小時合計可獲得'):last",
+                       "td:contains('您目前每小时合计可获得'):last",
+                       "td:contains('目前將會獲取'):last",
+                       "td:contains('目前将会获取'):last"],
+          "filters": ["parseFloat(query.text().match(/[獲获][得取](\\d+(?:\\.\\d+)?)/)[1])"]
         }
       }
     }

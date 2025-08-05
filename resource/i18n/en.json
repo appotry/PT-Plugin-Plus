@@ -2,7 +2,11 @@
   "name": "English (Beta)",
   "code": "en",
   "authors": [
-    "ronggang", "ylxb2016", "xiongqiwei", "jackson008"
+    "ronggang",
+    "ylxb2016",
+    "xiongqiwei",
+    "jackson008",
+    "MewX"
   ],
   "words": {
     "app": {
@@ -17,6 +21,7 @@
       "addLanguage": "Add a new language temporarily",
       "version": "Version",
       "systemLog": "System Log",
+      "darkMode": "Invert Color",
       "haveNewReleases": "Update available",
       "add": "Add",
       "edit": "Edit",
@@ -161,6 +166,10 @@
       "siteName": "Site name",
       "userName": "User name",
       "userLevel": "User level",
+      "levelRequirements": "Level requirements",
+      "seedingPoints": "Seeding Points",
+      "showHnR": "H&R",
+      "selectColumns": "Select Columns",
       "week": "Expressed in weeks",
       "timeline": "Time line",
       "settings": "Settings",
@@ -172,7 +181,9 @@
       "getUserInfoError": "An error occurred",
       "getUserInfoAbort": "Get user profile request has been canceled. ({siteName})",
       "getUserInfoAbortError": "Cancellation failed to get user profile request. ({siteName})",
+      "offline":"Offline",
       "headers": {
+        "date": "Date",
         "site": "Site",
         "userName": "User name",
         "levelName": "Level",
@@ -181,10 +192,45 @@
         "seeding": "Seeding",
         "seedingSize": "Seeding size",
         "bonus": "Bonus",
+        "seedingPoints": "Seeding Points",
+        "bonusPerHour": "Bonus per hour",
         "joinTime": "Join time",
         "lastUpdateTime": "Update at",
         "status": "Status",
-        "comments": "Comments"
+        "comments": "Comments",
+        "uploads": "Uploaded",
+        "trueDownloaded": "True Downloaded",
+        "classPoints": "Class Points",
+        "unsatisfieds": "Unsatisfieds",
+        "prewarn": "H&R Prewarn"
+      },
+      "levelRequirement": {
+        "levelRequirements": "Level Requirements",
+        "date": "Date",
+        "site": "Site",
+        "userName": "User name",
+        "levelName": "Level",
+        "activitiyData": "Activitiy data",
+        "ratio": "Ratio",
+        "seeding": "Seeding",
+        "seedingSize": "Seeding size",
+        "bonus": "Bonus",
+        "seedingPoints": "Seeding Points",
+        "seedingTime": "Seeding Time",
+        "bonusPerHour": "Bonus per hour",
+        "joinTime": "Join time",
+        "lastUpdateTime": "Update at",
+        "status": "Status",
+        "comments": "Comments",
+        "uploaded": "Uploaded",
+        "downloaded":"Downloaded",
+        "uploads": "Uploaded",
+        "downloads": "Downloaded",
+        "trueDownloaded": "True Downloaded",
+        "classPoints": "Class Points",
+        "uniqueGroups": "Unique Groups",
+        "perfectFLAC": "\"Perfect\" FLAC",
+        "alternative": "Alternative"
       },
       "tip": "N/A means no support",
       "nodata": "You have not added a site, please go to [Sites] to add a site."
@@ -220,9 +266,20 @@
       "blurSiteIcon": "Blur site icon",
       "userName": "User name",
       "userLevel": "User level",
+      "userId": "User UID",
       "showSites": "Show Sites",
       "close": "Close",
       "shareMessage": "Growth process",
+      "time": {
+        "year": " year(s) ",
+        "month": " month(s) ",
+        "day": " day(s) ",
+        "hour": " hour(s) ",
+        "mins": " minute(s) ",
+        "week": " week(s) ",
+        "ago": " ago",
+        "lessThanAWeek": "Less than a week"
+      },
       "total": {
         "uploaded": "Total uploads: ",
         "downloaded": "Total download: ",
@@ -236,7 +293,8 @@
         "downloaded": "Downloaded: ",
         "seedingSize": "Seeding size: ",
         "ratio": "Ratio: ",
-        "bonus": "Bonus: "
+        "bonus": "Bonus: ",
+        "bonusPerHour": "Bonus per hour: "
       },
       "inputDisplayName": "Please enter a name to display:",
       "inputShareMessage": "Please enter a message to display:"
@@ -273,6 +331,7 @@
         "seeders": "S",
         "leechers": "L",
         "completed": "C",
+        "comments": "Comments",
         "time": "Time(≈)",
         "action": "Action"
       },
@@ -492,6 +551,7 @@
           "loginPwd": "login password",
           "id": "ID",
           "autoStart": "Automatically start downloading when sending a torrent",
+          "tagIMDb": "Add IMDb tag when sending a torrent(Beta)",
           "autoCreate": "<Automatically generated after saving>",
           "test": "Test if the server can connect",
           "testSuccess": "Server can be connected",
@@ -658,7 +718,13 @@
           "priorityTip": "Can be used for search sorting",
           "offline": "Site is offline (downtime\/shutdown)",
           "timezone": "Timezone",
+          "upLoadLimit": "Upload limit",
+          "upLoadLimitTip": "Upload limit (KB\/s), 0 or empty for no limit",
           "disableMessageCount": "Display message count"
+        },
+        "userinfo": {
+          "title": "User Info",
+          "deleteConfirm": "confirm deletion? This operation cannot be restored, please make sure that you have made a corresponding backup."
         },
         "index": {
           "importAll": "One-click import site",
@@ -667,6 +733,7 @@
           "removeConfirm": "Are you sure you want to delete this site?",
           "removeTitle": "Delete confirmation",
           "plugins": "Plugins",
+          "showUserInfo": "UserInfo",
           "title": "Site settings",
           "subTitle": "Only the configured site will display the plugin icon and the corresponding function; the offline site will no longer participate in the search and information acquisition;",
           "searchEntry": "Search Entry",
@@ -807,6 +874,8 @@
       "user": {
         "notSupported": "Not Supported",
         "notLogged": "Not logged",
+        "needLogin": "Not logged",
+        "unknown": "Unknown",
         "getUserInfoFailed": "Failed to get username and id",
         "abortGetUserInfoFailed": "Cancel request to get user information failed"
       }
@@ -927,6 +996,7 @@
       "createSuccess": "Task creation completed",
       "createError": "Task creation failed",
       "noItem": "No matching seeds",
+      "filterSearchResults": "Filter search results",
       "savePath": "Save Path: ",
       "defaultPath": "Default Path",
       "setSavePath": "Set Save Path",
@@ -943,11 +1013,15 @@
       "fileCount": "Files: ",
       "sendConfirm": "Are you sure you want to send these {count} torrents?",
       "addToKeepUpload": "Add to task list",
+      "removeFromKeepUpload": "Remove from task list",
+      "redownload" : "Re-download",
       "addToKeepUploadConfirm": "Are you sure want add this torrent to task list?",
       "status": {
         "label": "Status: ",
         "downloading": "Downloading",
         "failed": "Verification failed",
+        "incorrectOrder": "Incorrect Order",
+        "missingFiles": "Missing Files",
         "success": "Verify successful",
         "waiting": "Waiting for verification",
         "downloadFailed": "Download Failed"

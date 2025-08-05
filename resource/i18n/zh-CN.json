@@ -2,7 +2,8 @@
   "name": "简体中文 Chinese (Simplified)",
   "code": "zh-CN",
   "authors": [
-    "栽培者"
+    "栽培者",
+    "MewX"
   ],
   "words": {
     "app": {
@@ -17,6 +18,7 @@
       "addLanguage": "临时添加新语言",
       "version": "版本",
       "systemLog": "系统日志",
+      "darkMode": "反转颜色",
       "haveNewReleases": "有更新可用",
       "add": "新增",
       "edit": "编辑",
@@ -161,6 +163,10 @@
       "siteName": "网站名称",
       "userName": "用户名称",
       "userLevel": "用户等级",
+      "levelRequirements": "等级要求",
+      "seedingPoints": "保种积分",
+      "showHnR": "H&R",
+      "selectColumns": "过滤列",
       "week": "时间显示为周数",
       "timeline": "时间轴",
       "settings": "参数",
@@ -172,7 +178,9 @@
       "getUserInfoError": "发生错误",
       "getUserInfoAbort": "{siteName} 获取用户资料请求已取消",
       "getUserInfoAbortError": "{siteName} 获取用户资料请求取消失败",
+      "offline":"已离线",
       "headers": {
+        "date": "日期",
         "site": "站点",
         "userName": "用户名",
         "levelName": "等级",
@@ -181,9 +189,43 @@
         "seeding": "做种数",
         "seedingSize": "做种体积",
         "bonus": "魔力值/积分",
+        "seedingPoints": "做种积分",
+        "bonusPerHour": "时魔",
         "joinTime": "入站时间",
         "lastUpdateTime": "数据更新于",
-        "status": "状态"
+        "status": "状态",
+        "uploads": "发布",
+        "trueDownloaded": "真实下载",
+        "classPoints": "等级积分",
+        "unsatisfieds": "H&R考核中",
+        "prewarn": "H&R预警"
+      },
+      "levelRequirement": {
+        "levelRequirements": "升级要求",
+        "date": "日期",
+        "site": "站点",
+        "userName": "用户名",
+        "levelName": "等级",
+        "activitiyData": "数据量",
+        "ratio": "分享率",
+        "seeding": "做种数",
+        "seedingSize": "做种体积",
+        "seedingTime": "做种时间",
+        "bonus": "魔力值",
+        "seedingPoints": "做种积分",
+        "bonusPerHour": "时魔",
+        "joinTime": "入站时间",
+        "lastUpdateTime": "数据更新于",
+        "status": "状态",
+        "uploaded": "上传量",
+        "downloaded":"下载量",
+        "uploads": "发布",
+        "downloads": "完成",
+        "trueDownloaded": "真实下载",
+        "classPoints": "等级积分",
+        "uniqueGroups": "独特分组",
+        "perfectFLAC": "“完美”FLAC",
+        "alternative": "择一"
       },
       "tip": "N/A 表示暂不支持",
       "nodata": "您还没有添加站点，请前往『站点设置』添加站点。"
@@ -218,10 +260,21 @@
       "siteName": "网站名称",
       "blurSiteIcon": "模糊站点图标",
       "userName": "用户名称",
+      "userId": "用户UID",
       "userLevel": "用户等级",
       "showSites": "展示站点",
       "close": "关闭",
       "shareMessage": "这些年走过的路",
+      "time": {
+        "year": "年",
+        "month": "月",
+        "day": "日",
+        "hour": "时",
+        "mins": "分",
+        "week": "周",
+        "ago": "前",
+        "lessThanAWeek": "不满一周"
+      },
       "total": {
         "uploaded": "上传总量：",
         "downloaded": "下载总量：",
@@ -235,7 +288,8 @@
         "downloaded": "下载量：",
         "seedingSize": "做种量：",
         "ratio": "分享率：",
-        "bonus": "积分值："
+        "bonus": "积分值：",
+        "bonusPerHour": "时　魔："
       },
       "inputDisplayName": "请输入需要显示的名称：",
       "inputShareMessage": "请输入需要显示的信息："
@@ -272,9 +326,9 @@
         "seeders": "上传",
         "leechers": "下载",
         "completed": "完成",
+        "comments": "评论",
         "time": "发布于(≈)",
-        "action": "操作",
-        "comments": "评论"
+        "action": "操作"
       },
       "optionsIsMissing": "系统参数丢失",
       "sitesIsMissing": "请先设置站点",
@@ -400,7 +454,7 @@
       },
       "base": {
         "title": "常规设置",
-        "defaultClient": "默认下载服务器（必选）",
+        "defaultClient": "默认下载服务器",
         "autoUpdate": "自动更新官方数据",
         "save": "保存",
         "allowSelectionTextSearch": "启用页面内容选择搜索",
@@ -492,6 +546,7 @@
           "loginPwd": "登录密码",
           "id": "ID",
           "autoStart": "发送种子时自动开始下载",
+          "tagIMDb": "发送种子时自动添加IMDb标签（Beta）",
           "autoCreate": "<保存后自动生成>",
           "test": "测试服务器是否可连接",
           "testSuccess": "服务器可连接",
@@ -658,7 +713,13 @@
           "priorityTip": "可用于搜索排序",
           "offline": "站点已离线（停机/关闭）",
           "timezone": "时区",
+          "upLoadLimit": "上传速度限制",
+          "upLoadLimitTip": "上传速度限制 (KB/s), 0或不填 不限速",
           "disableMessageCount": "关闭消息提醒"
+        },
+        "userinfo": {
+          "title": "用户数据",
+          "deleteConfirm": "确认删除？这个操作不可恢复，请确认你做好了相应备份。"
         },
         "index": {
           "importAll": "一键导入站点",
@@ -667,6 +728,7 @@
           "removeConfirm": "确认要删除这个站点吗？",
           "removeTitle": "删除确认",
           "plugins": "插件",
+          "showUserInfo": "用户数据",
           "title": "站点设置",
           "subTitle": "只有配置过的站点才会显示插件图标及相应的功能；<br/>已离线的站点不再参与搜索和信息获取；",
           "searchEntry": "搜索入口",
@@ -807,6 +869,8 @@
       "user": {
         "notSupported": "暂不支持",
         "notLogged": "未登录",
+        "needLogin": "未登录",
+        "unknown": "未知错误",
         "getUserInfoFailed": "获取用户名和编号失败",
         "abortGetUserInfoFailed": "取消获取用户信息请求失败"
       }
@@ -927,6 +991,7 @@
       "createSuccess": "辅种任务创建完成，请到辅种任务列表中进行后续操作",
       "createError": "辅种任务创建失败",
       "noItem": "没有符合条件的种子",
+      "filterSearchResults": "过滤搜索结果",
       "savePath": "保存目录：",
       "defaultPath": "默认目录",
       "setSavePath": "设置保存目录",
@@ -943,12 +1008,16 @@
       "fileCount": "文件数：",
       "sendConfirm": "是否确认要发送这 {count} 个种子？",
       "addToKeepUpload": "添加至辅种列表",
+      "removeFromKeepUpload": "移除种子",
+      "redownload" : "重新下载",
       "addToKeepUploadConfirm": "该种子未能通过初步校验，确认要添加吗？",
       "status": {
         "label": "状态：",
         "downloading": "正在下载",
         "downloaded": "下载完成",
         "failed": "校验失败",
+        "incorrectOrder": "文件顺序错误",
+        "missingFiles": "缺少文件",
         "success": "校验成功",
         "waiting": "等待校验",
         "downloadFailed": "下载失败"

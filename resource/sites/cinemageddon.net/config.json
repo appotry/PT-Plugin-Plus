@@ -16,6 +16,24 @@
     "pages": ["/browse.php"],
     "scripts": ["/schemas/NexusPHP/common.js", "browse.js"]
   }],
+  "levelRequirements": [
+    {
+      "level": "1",
+      "name": "Power User",
+      "uploaded": "25GB",
+      "downloaded": "20GB",
+      "ratio": "1.2",
+      "privilege": "Maximum of 8 concurrent downloads"
+    },
+    {
+      "level": "2",
+      "name": "CG Superfan",
+      "uploaded": "200GB",
+      "downloaded": "20GB",
+      "ratio": "1.5",
+      "privilege": "Maximum of 12 concurrent downloads"
+    }
+  ],
   "searchEntryConfig": {
     "page": "/browse.php",
     "resultType": "html",
@@ -46,11 +64,11 @@
       "fields": {
         "uploaded": {
           "selector": ["td.clx > .frames td.rowhead:contains('Uploaded') + td:first"],
-          "filters": ["query.text().replace(/,/g,'').match(/([\\d.]+ ?[ZEPTGMK]?i?B)/)", "(query && query.length>=2)?(query[1]).sizeToNumber():0"]
+          "filters": ["query.text().replace(/,/g,'').match(/([\\d.]+ ?[ZEPTGMK]?i?B)/)", "(query && query.length>=2)?(query[1]).sizeToNumber():null"]
         },
         "downloaded": {
           "selector": ["td.clx > .frames td.rowhead:contains('Downloaded') + td:first"],
-          "filters": ["query.text().replace(/,/g,'').match(/([\\d.]+ ?[ZEPTGMK]?i?B)/)", "(query && query.length>=2)?(query[1]).sizeToNumber():0"]
+          "filters": ["query.text().replace(/,/g,'').match(/([\\d.]+ ?[ZEPTGMK]?i?B)/)", "(query && query.length>=2)?(query[1]).sizeToNumber():null"]
         },
         "levelName": {
           "selector": "td.clx > .frames td.rowhead:contains('Class') + td:first"

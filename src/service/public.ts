@@ -122,7 +122,7 @@ class HelpFunctions {
     options = Object.assign(
       {
         type: "basic",
-        iconUrl: chrome.extension.getURL("/assets/icon-128.png"),
+        iconUrl: chrome.runtime.getURL("/assets/icon-128.png"),
         title: "PT 助手 Plus",
         priority: 0,
         message: ""
@@ -372,8 +372,8 @@ class HelpFunctions {
     }
 
     let site = sites.find((item: Site) => {
-      let cdn = [item.url].concat(item.cdn, item.formerHosts);
-      return item.host == host || cdn.join("").indexOf(host) > -1;
+      let cdn = [item.url].concat(item.cdn, item.formerHosts?.map(x => `//${x}`));
+      return item.host == host || cdn.join("").indexOf(`//${host}`) > -1;
     });
 
     if (site) {
@@ -399,7 +399,7 @@ class HelpFunctions {
     maps: Dictionary<any>,
     prefix: string = ""
   ): string {
-    if (!source) {
+    if (!source || typeof source !== 'string') {
       return source;
     }
     let result: string = source;

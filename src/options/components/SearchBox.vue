@@ -4,7 +4,9 @@
       <v-text-field
         flat
         solo-inverted
-        :prepend-icon="$vuetify.breakpoint.smAndUp ? 'search' : ''"
+        prepend-icon="search"
+        type="search"
+        @click:prepend="searchTorrent()"
         :label="$t('searchBox.searchTip')"
         class="mt-2 mb-0"
         v-model="searchKey"
@@ -12,7 +14,8 @@
         @click.stop="showSelectBox"
         @click:clear="clearSearchKey"
         :loading="loadStatus"
-        v-on:keyup.13="searchTorrent()"
+        enterkeyhint="search"
+        v-on:keyup.enter="searchTorrent()"
       >
         <!-- 近期热门 -->
         <v-menu
@@ -21,7 +24,6 @@
           class="top-searches"
           nudge-bottom="8"
           nudge-left="12"
-          v-if="topSearches.length > 0"
         >
           <v-btn slot="activator" flat small color="grey lighten-2">{{
             $t("common.hot")
@@ -34,7 +36,8 @@
             "
           >
             <v-container fluid grid-list-lg class="pa-3">
-              <v-layout row wrap>
+              <div v-if="topSearches.length == 0"> {{ $t('common.loading') }} </div>
+              <v-layout  v-else row wrap>
                 <v-flex v-for="(item, index) in topSearches" :key="index" xs4>
                   <v-card
                     @click="searchHotItem(item)"

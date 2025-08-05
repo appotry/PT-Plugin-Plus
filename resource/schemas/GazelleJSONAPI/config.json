@@ -43,6 +43,9 @@
         },
         "levelName": {
           "selector": ["response.userstats.class"]
+        },
+        "bonusPerHour": {
+          "selector": ["response.userstats.bonusPointsPerHour", "response.userstats.seedingBonusPointsPerHour"]
         }
       }
     },
@@ -56,6 +59,15 @@
         },
         "seeding": {
           "selector": ["response.community.seeding"]
+        },
+        "uploads": {
+          "selector": ["response.community.uploaded"]
+        },
+        "downloads": {
+          "selector": ["response.community.snatched"]
+        },
+        "uniqueGroups": {
+          "selector": ["response.community.groups"]
         }
       }
     },
@@ -63,7 +75,7 @@
       "page": "/torrents.php?type=seeding&userid=$user.id$",
       "fields": {
         "seedingSize": {
-          "selector": ["tr.torrent_row > td.nobr"],
+          "selector": ["tr.torrent_row > td.number_column.nobr"],
           "filters": ["jQuery.map(query, (item)=>{return $(item).text();})", "_self.getTotalSize(query)"]
         },
         "bonus": {

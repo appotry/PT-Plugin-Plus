@@ -80,19 +80,19 @@
         },
         "uploaded": {
           "selector": [".user-info__item > .fa-upload"],
-          "filters": ["query.parent().text().trim().replace(/,/g,'').match(/([\\d.]+ ?[ZEPTGMK]?i?B)/)", "(query && query.length>=2)?(query[1]).sizeToNumber():0"]
+          "filters": ["query.parent().text().trim().replace(/,/g,'').match(/([\\d.]+ ?[ZEPTGMK]?i?B)/)", "(query && query.length>=2)?(query[1]).sizeToNumber():null"]
         },
         "downloaded": {
           "selector": [".user-info__item > .fa-download"],
-          "filters": ["query.parent().text().trim().replace(/,/g,'').match(/([\\d.]+ ?[ZEPTGMK]?i?B)/)", "(query && query.length>=2)?(query[1]).sizeToNumber():0"]
+          "filters": ["query.parent().text().trim().replace(/,/g,'').match(/([\\d.]+ ?[ZEPTGMK]?i?B)/)", "(query && query.length>=2)?(query[1]).sizeToNumber():null"]
         },
         "ratio": {
           "selector": [".user-info__item > .fa-percent"],
           "filters": ["query.parent().text().trim().replace('Ratio: ', '')"]
         }, 
         "levelName": {
-          "selector": [".user-info__item > .fa-user"],
-          "filters":  ["query.parent().text().trim().split(' ')[0]"]
+          "selector": [".user-info__item > .fa-bolt"],
+          "filters":  ["query.parent().text().trim().replace(/(?<=.*)\\s[^\\s]*$/,'')"]
         }
       }
     },
@@ -110,7 +110,7 @@
         },
         "seeding": {
 	      "selector": ["td:contains('Total Seeding') + td"],
-          "filters": ["query.text().match(/(\\d+)/)", "(query && query.length>=2)?parseInt(query[1]):0"]
+          "filters": ["query.text().match(/(\\d+)/)", "(query && query.length>=2)?parseInt(query[1]):null"]
         },
         "seedingSize": {
           "value": -1

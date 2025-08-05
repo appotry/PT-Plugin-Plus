@@ -12,7 +12,8 @@ import {
   EPluginPosition,
   EWorkingStatus,
   EEncryptMode,
-  ETorrentStatus
+  ETorrentStatus,
+  ERequestType
 } from "./enum";
 
 /**
@@ -33,6 +34,7 @@ export interface DownloadClient {
   loginPwd?: string;
   paths?: any;
   autoStart?: boolean;
+  tagIMDb?: boolean;
   type?: string;
 }
 
@@ -267,6 +269,48 @@ export interface Site {
   mergeSchemaTagSelectors?: boolean;
   // 消息提醒开关
   disableMessageCount?: boolean;
+  // 等级要求
+  levelRequirements?: LevelRequirement[];
+  upLoadLimit?: number;
+}
+
+export interface LevelRequirement {
+  level?: number;
+  name?: string;
+  // 间隔要求
+  interval?: number;
+  // 日期要求
+  requiredDate?: string;
+  // 上传数要求
+  uploads?: number;
+  // 下载数要求
+  downloads?: number;
+  // 上传量要求
+  uploaded?: string | number;
+  // 下载量要求
+  downloaded?: string | number;
+  // 真实下载量
+  trueDownloaded?: string | number;
+  // 积分要求
+  bonus?: number;
+  // 做种积分要求
+  seedingPoints?: number;
+  // 做种时间要求
+  seedingTime?: number;
+  // 保种体积要求
+  seedingSize?: number;
+  // 分享率要求
+  ratio?: number;
+  // 等级积分要求
+  classPoints?: number;
+  // 独特分组要求
+  uniqueGroups?: number;
+  // “完美”FLAC要求
+  perfectFLAC?: number;
+  // 权限
+  privilege?: string;
+  // 可选要求
+  alternative?: LevelRequirement;
 }
 
 export interface Request {
@@ -298,9 +342,11 @@ export interface DownloadOptions {
   title?: string;
   savePath?: string;
   autoStart?: boolean;
+  tagIMDb?: boolean;
   clientId?: string;
   // 来源链接地址
   link?: string;
+  imdbId?: string;
 }
 
 /**
@@ -340,6 +386,7 @@ export interface SearchResultItemCategory {
  * 搜索返回结果
  */
 export interface SearchResultItem {
+  id?: string;
   site: Site;
   title: string;
   titleHTML?: string;
@@ -362,6 +409,7 @@ export interface SearchResultItem {
   // 状态
   status?: ETorrentStatus;
   host?: string;
+  imdbId?: string;
 }
 
 /**
@@ -434,6 +482,9 @@ export interface SearchEntryConfig {
   page: string;
   entry?: string;
   resultType?: ERequestResultType;
+  // don't encode the key, for some json post API. e.g. TNode
+  keepOriginKey?: boolean
+  requestDataType?: ERequestType;
   queryString?: string;
   parseScriptFile?: string;
   parseScript?: string;
@@ -514,22 +565,46 @@ export interface UserInfo {
   name: string;
   // 上传量
   uploaded?: number;
+  // 发布数
+  uploads?: number;
   // 下载量
   downloaded?: number;
+  // 真实下载量
+  trueDownloaded?: string | number;
+  // 下载数
+  downloads?: number;
   // 分享率
   ratio?: number;
   // 当前做种数量
   seeding?: number;
   // 做种体积
   seedingSize?: number;
+  // 做种列表
+  seedingList?: string[];
   // 当前下载数量
   leeching?: number;
   // 等级名称
   levelName?: string;
   // 魔力值/积分
   bonus?: number;
+  // 保种积分         //add by koal 220920
+  seedingPoints?: number;
+  // 做种时间要求
+  seedingTime?: number;
+  // 时魔
+  bonusPerHour?: number;
+  // 积分页面
+  bonusPage?: string;
+  // H&R未达标页面
+  unsatisfiedsPage?: string;
   // 入站时间
   joinTime?: number;
+  // 等级积分
+  classPoints?: number;
+  // H&R未达标
+  unsatisfieds?: string | number;
+  // H&R预警
+  prewarn?: number;
   // 最后更新时间
   lastUpdateTime?: number;
   // 最后更新状态
@@ -546,6 +621,12 @@ export interface UserInfo {
   lastErrorMsg?: string;
   // 消息数量
   messageCount?: number;
+  // 独特分组
+  uniqueGroups?: number;
+  // “完美”FLAC
+  perfectFLAC?: number;
+  // 下一等级
+  nextLevels?: LevelRequirement[];
   [key: string]: any;
 }
 
@@ -593,6 +674,7 @@ export interface ICollection {
   size: number;
   time?: number;
   subTitle?: string;
+  imdbId?: string;
   movieInfo?: {
     title: string;
     alt_title: string;

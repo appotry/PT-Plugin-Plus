@@ -9,6 +9,71 @@
   ],
   "schema": "NexusPHP",
   "host": "pt.keepfrds.com",
+  "levelRequirements": [{
+    "level": "1", 
+    "name": "Power User",
+    "interval": "5",
+    "downloaded": "50GB",
+    "ratio": "1.0",
+    "bonus": "3200",
+    "privilege": "请求续种；查看排行榜；查看其它用户的种子历史；查看IMDB/Douban信息；使用魔力值"
+  },{
+    "level": "2", 
+    "name": "Elite User",
+    "interval": "10",
+    "downloaded": "150GB",
+    "ratio": "1.5",
+    "bonus": "19200",
+    "privilege": "封存账号后不会被删除；查看排行榜，IMDB/Douban Top榜单和论坛的邀请区"
+  },{
+    "level": "3", 
+    "name": "Crazy User",
+    "interval": "15",
+    "downloaded": "300GB",
+    "ratio": "2.0",
+    "bonus": "76800",
+    "privilege": "在做种/下载的时候选择匿名模式；使用自动合集功能"
+  },{
+    "level": "4", 
+    "name": "Insane User",
+    "interval": "30",
+    "downloaded": "500GB",
+    "ratio": "2.5",
+    "bonus": "256000",
+    "privilege": "查看普通日志"
+  },{
+    "level": "5", 
+    "name": "Veteran User",
+    "interval": "60",
+    "downloaded": "1TB",
+    "ratio": "3.5",
+    "bonus": "640000",
+    "privilege": "查看其它用户的评论、帖子历史；永远保留账号"
+  },{
+    "level": "6", 
+    "name": "Extreme User",
+    "interval": "90",
+    "downloaded": "2TB",
+    "ratio": "4.0",
+    "bonus": "1280000",
+    "privilege": "上传量按照等级对应的限速计算"
+  },{
+    "level": "7", 
+    "name": "Ultimate User",
+    "interval": "120",
+    "downloaded": "3TB",
+    "ratio": "4.5",
+    "bonus": "1920000",
+    "privilege": "上传速度限制提升为普通用户的二倍"
+  },{
+    "level": "8", 
+    "name": "Nexus Master",
+    "interval": "150",
+    "downloaded": "4TB",
+    "ratio": "5.0",
+    "bonus": "2560000",
+    "privilege": "除了数据考核要求，其他权利等同于VIP，包括没有上传速度的限制"
+  }],
   "searchEntryConfig": {
     "merge": true,
     "fieldSelector": {
@@ -141,6 +206,11 @@
           "selector": ["td.rowhead:contains('魔力值') + td, td.rowhead:contains('Karma Points') + td"],
           "filters": ["query.text().replace(/,/g,'').match(/魔力值:.+?([\\d.]+)/)[1]", "parseFloat(query)"]
         },
+        "bonusPerHour": {
+          "selector": ["td.rowhead:contains('魔力值') + td, td.rowhead:contains('Karma Points') + td"],
+          "filters": ["query.text().replace(/,/g,'').match(/[\\d.]+/g)",
+          "query.length == 5 ? parseFloat(query[2]) + parseFloat(query[4]) : parseFloat(query[2])"]
+        },
         "seedingSize": {
           "selector": ["td.rowhead:contains('当前做种') + td, td.rowhead:contains('Current Seeding') + td, td.rowhead:contains('目前做種') + td"],
           "filters": ["query.text().trim().replace(/,/g,'').match(/([\\d.]+ ?[ZEPTGMK]?i?B)/)", "(query && query.length>=2)?(query[1]).sizeToNumber():0"]
@@ -161,5 +231,9 @@
   "torrentTagSelectors": [{
     "name": "⛔️",
     "selector": "td.embedded b > font.recommended:contains('禁转')"
+  },{
+    "name": "Neutral",
+    "selector": "img.pro_nl",
+    "color": "purple"
   }]
 }

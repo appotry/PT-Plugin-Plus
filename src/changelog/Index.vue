@@ -5,18 +5,15 @@
       <div v-html="marked(content)" class="markdown-body"></div>
       <div class="footer">
         <div v-html="marked(footer)" class="mt-2"></div>
-        <div>&copy; 栽培者 {{ year }}, 版本 {{ version }}</div>
-        <div class="mt-1">
-          <img src="/assets/donate.png" />
-        </div>
+        <div>&copy; PT 助手 {{ year }}, 版本 {{ version }}</div>
       </div>
     </div>
   </v-app>
 </template>
 <script lang="ts">
 import Vue from "vue";
-import marked from "marked";
-import {PPF} from "@/service/public";
+import { marked } from "marked";
+import { PPF } from "@/service/public";
 
 // 重写 version，因为使用 getVersion 获取到的是 `v1.5.1` 或者 `v1.5.1.dc988f6`，需要重写为 `v1.5.1` 否则无法获取release信息
 let MAIN_VERSION = PPF.getVersion();
@@ -29,38 +26,33 @@ export default Vue.extend({
   data() {
     return {
       content:
-        "正在加载…… <br>（如长时间未能加载成功，请前往 https://github.com/ronggang/PT-Plugin-Plus/releases/ 查看发布说明。）",
+        "正在加载…… <br>（如长时间未能加载成功，请前往 https://github.com/pt-plugins/PT-Plugin-Plus/releases/ 查看发布说明。）",
       footer:
-        "[项目主页](https://github.com/ronggang/PT-Plugin-Plus) - [使用说明](https://github.com/ronggang/PT-Plugin-Plus/wiki) - [常见问题](https://github.com/ronggang/PT-Plugin-Plus/wiki/frequently-asked-questions) - [意见反馈](https://github.com/ronggang/PT-Plugin-Plus/issues) - [打开助手](index.html)",
+        "[项目主页](https://github.com/pt-plugins/PT-Plugin-Plus) - [使用说明](https://github.com/pt-plugins/PT-Plugin-Plus/wiki) - [常见问题](https://github.com/pt-plugins/PT-Plugin-Plus/wiki/frequently-asked-questions) - [意见反馈](https://github.com/pt-plugins/PT-Plugin-Plus/issues) - [打开助手](index.html)",
       version: MAIN_VERSION,
       failContent:
-        "更新日志加载失败，请前往 https://github.com/ronggang/PT-Plugin-Plus/releases/ 查看发布说明",
+        "更新日志加载失败，请前往 https://github.com/pt-plugins/PT-Plugin-Plus/releases/ 查看发布说明",
       year: new Date().getFullYear()
     };
   },
 
   created() {
-    $.getJSON(
-      `https://api.github.com/repos/ronggang/PT-Plugin-Plus/releases/tags/${this.version}`
-    )
-      .done((result: any) => {
-        if (result && result.body) {
+    fetch(`https://api.github.com/repos/pt-plugins/PT-Plugin-Plus/releases/tags/${this.version}`)
+        .then(r => r.json())
+        .then((result: any) => {
           this.content = this.parse(result.body);
-        } else {
+        })
+        .catch(() => {
           this.content = this.failContent;
-        }
-      })
-      .fail((result: any) => {
-        this.content = this.failContent;
-      });
+        });
   },
 
   methods: {
     marked,
     parse(content: string): string {
       return content.replace(
-          /(#)(\d+)/g,
-          "[#$2](https://github.com/ronggang/PT-Plugin-Plus/issues/$2)"
+        /(#)(\d+)/g,
+        "[#$2](https://github.com/pt-plugins/PT-Plugin-Plus/issues/$2)"
       );
     }
   }

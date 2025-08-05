@@ -1,5 +1,5 @@
 <template>
-  <v-card class="mb-5" color="grey lighten-4">
+  <v-card class="mb-5" :color="$vuetify.dark ? '' : 'grey lighten-4'">
     <v-card-text>
       <v-form v-model="valid">
         <!-- 站点名称 -->
@@ -136,6 +136,11 @@
           </template>
         </v-autocomplete>
 
+        <v-text-field
+                v-model="site.upLoadLimit"
+                :label="$t('settings.sites.editor.upLoadLimit')"
+                :placeholder="$t('settings.sites.editor.upLoadLimitTip')"
+        ></v-text-field>
         <!-- 允许获取用户信息 -->
         <v-switch
           :label="$t('settings.sites.editor.allowGetUserInfo')"

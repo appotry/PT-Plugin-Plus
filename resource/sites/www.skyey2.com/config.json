@@ -6,7 +6,63 @@
   "description": "天雪",
   "icon": "https://www.skyey2.com/favicon.ico",
   "tags": ["动漫"],
+  "collaborator": [
+    "栽培者",
+    "MewX",
+    "fzlins",
+    "zhuweitung"
+  ],
   "host": "www.skyey2.com",
+  "levelRequirements": [
+    {
+      "level": 1,
+      "name": "Lv.1 白露",
+      "bonus": 1000,
+      "privilege": "自定义头衔；允许发短消息；允许加好友；允许设置回帖奖励；允许参与点评；"
+    },
+    {
+      "level": 2,
+      "name": "Lv.2 秋分",
+      "bonus": 3000,
+      "privilege": ""
+    },
+    {
+      "level": 3,
+      "name": "Lv.3 霜降",
+      "bonus": 5000,
+      "privilege": ""
+    },
+    {
+      "level": 4,
+      "name": "Lv.4 小雪",
+      "bonus": 10000,
+      "privilege": ""
+    },
+    {
+      "level": 5,
+      "name": "Lv.5 大雪",
+      "bonus": 30000,
+      "privilege": ""
+    },
+    {
+      "level": 6,
+      "name": "Lv.6 小寒",
+      "bonus": 100000,
+      "privilege": ""
+    },
+    {
+      "level": 7,
+      "name": "Lv.7 大寒",
+      "bonus": 300000,
+      "privilege": ""
+    },
+    {
+      "level": 8,
+      "name": "Lv.8 立春",
+      "bonus": 1000000,
+      "privilege": ""
+    }
+  ],
   "selectors": {
     "userBaseInfo": {
       "page": "/",
@@ -29,12 +85,25 @@
       "page": "/home.php?mod=space&uid=$user.id$",
       "fields": {
         "uploaded": {
-          "selector": ["#psts li:contains('上传量')"],
-          "filters": ["query.text().replace(/,/g,'').match(/上传量+?([\\d.]+ ?[ZEPTGMK]?i?B)/)", "(query && query.length>=2)?(query[1]).sizeToNumber():0"]
+          "selector": "#psts li:contains('上传量')",
+          "filters": [
+            "query.text().match(/上传量.+?\\/\\s*([\\d\\.]+\\s*?[ZEPTGMK]?i?B)/)",
+            "(query && query.length>=2) ? query[1].sizeToNumber() : 0"
+          ]
         },
         "downloaded": {
-          "selector": ["#psts li:contains('下载量')"],
-          "filters": ["query.text().replace(/,/g,'').match(/下载量+?([\\d.]+ ?[ZEPTGMK]?i?B)/)", "(query && query.length>=2)?(query[1]).sizeToNumber():0"]
+          "selector": "#psts li:contains('下载量')",
+          "filters": [
+            "query.text().match(/下载量.+?\\/\\s*([\\d\\.]+\\s*?[ZEPTGMK]?i?B)/)",
+            "(query && query.length>=2) ? query[1].sizeToNumber() : 0"
+          ]
+        },
+        "ratio": {
+          "selector": "ul.bbda",
+          "filters": [
+            "query.text().match(/分享率\\s+?([\\d\\.]+)/)",
+            "(query && query.length>=2) ? query[1].trim() : 0"
+          ]
         },
         "levelName": {
           "selector": "a[href='home.php?mod=spacecp&ac=usergroup']",
@@ -42,25 +111,38 @@
         },
         "bonus": {
           "selector": ["#ratio"],
-          "filters": ["query.text().replace('论坛积分:', '').replace(/,/g,'').trim()", "parseFloat(query)"]
+          "filters": [
+            "query.text().replace('积分: ', '').replace(/,/g,'').trim()",
+            "parseFloat(query)"
+          ]
         },
         "joinTime": {
           "selector": "#pbbs > li:contains('注册时间')",
-          "filters": ["query.text().replace('注册时间', '').trim()", "dateTime(query).isValid()?dateTime(query).valueOf():query"]
-        },
-        "seeding": {
-          "selector": ["#psts li:contains('即时保种数')"],
-          "filters": ["query.text().replace('即时保种数', '').replace(/,/g,'').trim()", "parseFloat(query)"]
-        },
-        "seedingSize": {
-          "value": -1
+          "filters": [
+            "query.text().replace('注册时间', '').trim()",
+            "dateTime(query).isValid()?dateTime(query).valueOf():query"
+          ]
         }
       }
-    }
+    },
+    "userSeedingTorrents": {
+      "prerequisites": "!user.seeding",
+      "page": "/forum.php?&mod=torrents&cat_5up=on",
+      "parser": "getUserSeedingTorrents.js",
+      "fields": {
+        "seeding": {
+          "selector": ["table.torrents > tbody > tr:not(:eq(0))"],
+          "filters": ["query.length"]
+        },
+        "seedingSize": {
+          "selector": ["table.torrents > tbody > tr:not(:eq(0))"],
+          "filters": ["jQuery.map(query.find('td.rowfollow:eq(3)'), (item)=>{return $(item).text();})", "_self.getTotalSize(query)"]
+        }
+      }
+    } 
   },
   "supportedFeatures": {
-    "imdbSearch": false,
-    "userData": "◐"
+    "imdbSearch": false
   },
   "searchEntryConfig": {
     "fieldSelector": {

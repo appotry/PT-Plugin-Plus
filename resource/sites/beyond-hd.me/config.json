@@ -1,23 +1,28 @@
 {
   "name": "BeyondHD",
   "timezoneOffset": "+0000",
-  "description": "综合",
+  "description": "Beyond Your Imagination,BeyondHD is a community-built Movie/TV database. Every piece of data has been added by our amazing community since 2012. BeyondHD is blessed to have a proactive userbase that focuses on HD content, an awesome/secure codebase and a helpful and friendly volunteer Staff team.",
   "url": "https://beyond-hd.me/",
   "icon": "https://beyond-hd.me/favicon.ico",
-  "tags": ["综合"],
+  "tags": ["影视"],
   "schema": "UNIT3D",
   "host": "beyond-hd.me",
   "collaborator": "lengmianxia",
+  "plugins": [{
+    "name": "个人种子列表页面",
+    "pages": ["^/.*?/(uploads|downloads|seeds|active|torrents|unsatisfieds)"],
+    "scripts": ["/schemas/NexusPHP/common.js", "/schemas/UNIT3D/torrents.js"]
+  }],
   "searchEntryConfig": {
     "page": "/torrents",
     "resultType": "html",
     "parseScriptFile": "getSearchResult.js",
     "resultSelector": "div.table-torrents > table:last",
-    "queryString": "search=$key$",
+    "queryString": "search=$key$&qty=100",
     "area": [{
       "name": "IMDB",
       "keyAutoMatch": "^(tt\\d+)$",
-      "queryString": "imdb=$key$"
+      "queryString": "imdb=$key$&qty=100"
     }],
     "fieldSelector": {
       "progress": {
@@ -55,28 +60,28 @@
       "page": "/",
       "fields": {
         "id": {
-          "selector": ["a[href*='settings']:first"],
+          "selector": ["div.dropmenu > a[href]:first"],
           "attribute": "href",
           "switchFilters": [
-            ["query.match(/me\\/(.+)\\.(.+)\\/settings/)", "(query && query.length>=3)?(query[2]):''"],
+            ["query.match(/me\\/(.+)\\.(.+)/)", "(query && query.length>=3)?(query[2]):''"],
             ["query ? query.getQueryString('id'):''"]
           ]
         },
         "name": {
-          "selector": ["a[href*='settings']:first"],
+          "selector": ["div.dropmenu > a[href]:first"],
           "attribute": "href",
           "switchFilters": [
-            ["query.match(/me\\/(.+)\\.(.+)\\/settings/)", "(query && query.length>=3)?(query[1]):''"],
+            ["query.match(/me\\/(.+)\\.(.+)/)", "(query && query.length>=3)?(query[1]):''"],
             ["query ? query.getQueryString('id'):''"]
           ]
         },
         "uploaded": {
           "selector": ["a[href*='uploads']:first"],
-          "filters": ["query.parent().text().trim().replace(/,|\\n|\\s+/g,'').match(/([\\d.]+ ?[ZEPTGMK]?i?B)/)", "(query && query.length>=2)?(query[1]).sizeToNumber():0"]
+          "filters": ["query.parent().text().trim().replace(/,|\\n|\\s+/g,'').match(/([\\d.]+ ?[ZEPTGMK]?i?B)/)", "(query && query.length>=2)?(query[1]).sizeToNumber():null"]
         },
         "downloaded": {
           "selector": ["a[href*='downloads']:first"],
-          "filters": ["query.parent().text().trim().replace(/,|\\n|\\s+/g,'').match(/([\\d.]+ ?[ZEPTGMK]?i?B)/)", "(query && query.length>=2)?(query[1]).sizeToNumber():0"]
+          "filters": ["query.parent().text().trim().replace(/,|\\n|\\s+/g,'').match(/([\\d.]+ ?[ZEPTGMK]?i?B)/)", "(query && query.length>=2)?(query[1]).sizeToNumber():null"]
         },
         "bonus": {
           "selector": ["a[href*='bonus']:first"],
@@ -87,7 +92,7 @@
           "filters": ["query.parent().text().trim()"]
         },
         "messageCount": {
-          "selector": [".beta-alert[href$='/mail'] .notify"],
+          "selector": [".beta-alert:not([title='Bets']) .notify"],
           "filters": ["query[0]?11:0"]
         }
       }
@@ -105,6 +110,31 @@
         "joinTime": {
           "selector": "div.button-holder h5:contains('Since: ')",
           "filters": ["query.text().trim().replace('Since: ', '').replace('Member ', '')", "dateTime(query).isValid()?dateTime(query).valueOf():query"]
+        },
+        "unsatisfiedsPage": {
+          "selector": ["a[href$='/unsatisfieds']:first"],
+          "attribute": "href",
+          "filters": ["query ? new URL(query).pathname : null"]
+        }
+      }
+    },
+    "bonusExtendInfo": {
+      "prerequisites": "!user.bonusPerHour",
+      "page": "/$user.name$.$user.id$/bonus",
+      "fields": {
+        "bonusPerHour": {
+          "selector": ["div.panel-body > div.hd-table > div:first > div:first"],
+          "filters": ["parseFloat(query.text())"]
+        }
+      }
+    },
+    "hnrExtendInfo": {
+      "prerequisites": "!(!user.unsatisfiedsPage)",
+      "page": "$user.unsatisfiedsPage$",
+      "fields": {
+        "unsatisfieds": {
+          "selector": ["ul.pagination","tr[class='userFiltered'][hr='0'][immune='0']"],
+          "filters": ["query.find('li > a:not([rel])').length > 0 ? query.find('li > a:not([rel])').last().text() * 50 + '+' : query.has('a[href*=\"download\"]').length"]
         }
       }
     },
@@ -113,11 +143,11 @@
       "merge": true,
       "fields": {
         "downloadURL": {
-          "selector": ["a.bhd-fl-button[href*='/download/']"],
+          "selector": ["a.bhd-toolx-button[href*='/download/']"],
           "filters": ["query.attr('href')"]
         },
         "sayThanksButton": {
-          "selector": ["a.bhd-fl-button[title*='Thank']"],
+          "selector": ["div.torrentthankbuttons[title*='Thank']"],
           "filters": ["query"]
         }
       }

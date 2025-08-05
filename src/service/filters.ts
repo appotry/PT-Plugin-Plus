@@ -19,6 +19,8 @@ interface IFilter {
   };
   timeAgoToNumber: (source: string) => number;
   [key: string]: any;
+  formatInteger:(source: number) => string;
+  formatIMDbId:(source: string) => string;
 }
 
 /**
@@ -286,6 +288,20 @@ export const filters: IFilter = {
       origin: `${a.protocol}//${a.hostname}` + (a.port ? `:${a.port}` : "")
     };
   },
+  /**
+   * 将数字转为正确的IMDbId
+   * @param source
+   */
+  formatIMDbId(imdbId: string): string {
+    if (Number(imdbId))
+    {
+      if (imdbId.length < 7)
+        imdbId = imdbId.padStart(7, '0');
+      
+      imdbId = "tt" + imdbId;
+    }
+    return imdbId;
+  },
 
   /**
    * 将多少时间之前的格式转为时间数字（大概时间）
@@ -343,5 +359,8 @@ export const filters: IFilter = {
     }
 
     return result.getTime();
-  }
+  },
+  formatInteger(source: number) : string {
+    return this.formatNumber(source, "###,###,###,###")
+  },
 };

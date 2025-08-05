@@ -10,6 +10,7 @@
       options.isLogged = true;
 
       this.haveData = true;
+      this.site = options.site;
     }
 
     /**
@@ -20,9 +21,8 @@
         return [];
       }
       let site = options.site;
-      site.searchEntryConfig = options.entry
       let selector =
-        options.resultSelector || "div.table-responsive > table:first";
+        options.resultSelector || "table.data-table";
       let table = options.page.find(selector);
       // 获取种子列表行
       let rows = table.find("> tbody > tr");
@@ -53,10 +53,8 @@
         completed: -1,
         // 评论数量
         comments: -1,
-        // 发布人
-        author: header.length - 1,
         // 分类
-        category: 1
+        category: 0
       };
 
       if (site.url.lastIndexOf("/") != site.url.length - 1) {
@@ -67,75 +65,33 @@
       for (let index = 0; index < header.length; index++) {
         let cell = header.eq(index);
         let text = cell.text();
-
-        // 评论数
-        if (cell.find("a[href*='comments']").length) {
-          fieldIndex.comments = index;
-          fieldIndex.author =
-            index == fieldIndex.author ? -1 : fieldIndex.author;
-          continue;
-        }
-
         // 发布时间
-        if (
-          cell.find("a[href*='created_at']").length ||
-          cell.find("i.fa-clock").length
-        ) {
+        if (cell.html().match("created_at") || cell.attr('class').endsWith("age-header")) {
           fieldIndex.time = index;
-          fieldIndex.author =
-            index == fieldIndex.author ? -1 : fieldIndex.author;
           continue;
         }
 
         // 大小
-        if (
-          cell.find("a[href*='size']").length ||
-          cell.find("i.fa-file").length
-        ) {
+        if (cell.attr('class').indexOf("torrent-listings-size") > -1 || cell.attr('class').endsWith("size-header") || cell.find("i.fa-database").length) {
           fieldIndex.size = index;
-          fieldIndex.author =
-            index == fieldIndex.author ? -1 : fieldIndex.author;
           continue;
         }
 
         // 种子数
-        if (
-          cell.find("a[href*='seed']").length ||
-          cell.find("i.fa-arrow-circle-up").length
-        ) {
+        if (cell.find("i.fa-arrow-alt-circle-up").length) {
           fieldIndex.seeders = index;
-          fieldIndex.author =
-            index == fieldIndex.author ? -1 : fieldIndex.author;
           continue;
         }
 
         // 下载数
-        if (
-          cell.find("a[href*='leech']").length ||
-          cell.find("i.fa-arrow-circle-down").length
-        ) {
+        if (cell.find("i.fa-arrow-alt-circle-down").length) {
           fieldIndex.leechers = index;
-          fieldIndex.author =
-            index == fieldIndex.author ? -1 : fieldIndex.author;
           continue;
         }
 
         // 完成数
-        if (
-          cell.find("a[href*='complete']").length ||
-          cell.find("i.fa-check-square").length
-        ) {
+        if (cell.find("i.fa-check-circle").length) {
           fieldIndex.completed = index;
-          fieldIndex.author =
-            index == fieldIndex.author ? -1 : fieldIndex.author;
-          continue;
-        }
-
-        // 分类
-        if (cell.is(".torrents-icon")) {
-          fieldIndex.category = index;
-          fieldIndex.author =
-            index == fieldIndex.author ? -1 : fieldIndex.author;
           continue;
         }
       }
@@ -146,7 +102,7 @@
           const row = rows.eq(index);
           let cells = row.find(">td");
 
-          let title = row.find("a.view-torrent");
+          let title = row.find("a.view-torrent, a.torrent-search--list__name");
           if (title.length == 0) {
             continue;
           }
@@ -178,9 +134,22 @@
             url = `${site.url}${url}`;
           }
 
+          let imdbId = row.find("div#imdb_id")
+          if (imdbId.length > 0)
+          {
+            imdbId = imdbId.text().replace(/\D/g,'');
+            if (imdbId.length < 7)
+              imdbId = imdbId.padStart(7, '0');
+      
+            imdbId = "tt" + imdbId;
+          }
+          else {
+            imdbId = null;
+          }
+
           let data = {
-            title: title.text(),
-            subTitle: this.getSubTitle(title, row),
+            title: title.text().trim(),
+            subTitle: this.getSubTitle(title, row).trim(),
             link,
             url: url,
             size:
@@ -195,28 +164,25 @@
                     .eq(fieldIndex.time)
                     .find("span[title]")
                     .attr("title") ||
-                  cells.eq(fieldIndex.time).text().replace('秒前', ' seconds ago').replace('秒前', ' seconds ago').replace('分钟前', ' minutes ago').replace('分鐘前', ' minutes ago').replace('天前', ' day ago').replace('小時前', ' hours ago').replace('小时前', ' hours ago')||
+                  cells.eq(fieldIndex.time).text().replace('秒前', ' seconds ago').replace('秒前', ' seconds ago').replace('分钟前', ' minutes ago').replace('分鐘前', ' minutes ago').replace('天前', ' day ago').replace('小時前', ' hours ago').replace('小时前', ' hours ago').replace('周前', ' weeks ago').replace('个月前', ' months ago').replace('年前', ' years ago')||
                   "",
-            author:
-              fieldIndex.author == -1
-                ? ""
-                : cells.eq(fieldIndex.author).text() || "",
+            author:  "",
             seeders:
               fieldIndex.seeders == -1
                 ? ""
-                : cells.eq(fieldIndex.seeders).text() || 0,
+                : cells.eq(fieldIndex.seeders).text().trim() || 0,
             leechers:
               fieldIndex.leechers == -1
                 ? ""
-                : cells.eq(fieldIndex.leechers).text() || 0,
+                : cells.eq(fieldIndex.leechers).text().trim() || 0,
             completed:
               fieldIndex.completed == -1
                 ? ""
-                : cells.eq(fieldIndex.completed).text() || 0,
+                : cells.eq(fieldIndex.completed).text().trim() || 0,
             comments:
               fieldIndex.comments == -1
                 ? ""
-                : cells.eq(fieldIndex.comments).text() || 0,
+                : cells.eq(fieldIndex.comments).text().trim() || 0,
             site: site,
             tags: Searcher.getRowTags(site, row),
             entryName: options.entry.name,
@@ -225,7 +191,8 @@
                 ? null
                 : this.getCategory(cells.eq(fieldIndex.category)),
             progress: this.getFieldValue(row, cells, fieldIndex, "progress"),
-            status: this.getFieldValue(row, cells, fieldIndex, "status")
+            status: this.getFieldValue(row, cells, fieldIndex, "status"),
+            imdbId: imdbId
           };
           results.push(data);
         }
@@ -242,35 +209,15 @@
     }
 
     /**
-     * 获取标签
-     * @param {*} row
-     * @param {*} selectors
-     * @return array
-     */
-    getTags(row, selectors) {
-      let tags = [];
-      if (selectors && selectors.length > 0) {
-        selectors.forEach(item => {
-          if (item.selector) {
-            let result = row.find(item.selector);
-            if (result.length) {
-              tags.push({
-                name: item.name,
-                color: item.color
-              });
-            }
-          }
-        });
-      }
-      return tags;
-    }
-
-    /**
      * 获取副标题
      * @param {*} title
      * @param {*} row
      */
     getSubTitle(title, row) {
+      let subTitle = Searcher.getFieldValue(this.site, row, "subTitle");
+      if (subTitle) {
+        return subTitle;
+      }
       return "";
     }
 
@@ -308,9 +255,9 @@
         if (returnCell) {
           return cell;
         }
-        result = cell.text();
+        result = cell.text().trim();
       }
-
+      if(result == "")return null;
       return result;
     }
   }

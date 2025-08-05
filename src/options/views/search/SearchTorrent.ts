@@ -172,6 +172,11 @@ export default Vue.extend({
       this.shiftKey = false;
     });
     window.addEventListener("scroll", this.handleScroll);
+
+    // 生成辅种任务后清除选择
+    this.$root.$on("KeepUploadTaskCreateSuccess",() => {
+      this.toggleAll();
+    });
   },
   destroyed() {
     window.removeEventListener("scroll", this.handleScroll);
@@ -843,6 +848,18 @@ export default Vue.extend({
           }
         }
 
+        if (!item.progress && !item.status) {
+          // 对比用户信息的seedingList修改做种状态信息
+          if (item.site && item.site.user && item.site.user.seedingList) {
+            let seedingList = item.site.user.seedingList;
+            let seeding = seedingList.some(id => item.id && item.id == id);
+            if (seeding) {
+              item.progress = 100;
+              item.status = 2;
+            }
+          }
+        }
+
         if (dayjs(item.time).isValid()) {
           let val: number | string = item.time + "";
           // 标准时间戳需要 * 1000
@@ -1049,7 +1066,8 @@ export default Vue.extend({
       title?: string,
       options?: any,
       callback?: any,
-      link: string = ""
+      link: string = "",
+      imdbId?: string
     ) {
       console.log(url);
       this.clearMessage();
@@ -1092,8 +1110,10 @@ export default Vue.extend({
         title,
         savePath: savePath,
         autoStart: defaultClientOptions.autoStart,
+        tagIMDb: defaultClientOptions.tagIMDb,
         clientId: defaultClientOptions.id,
-        link
+        link,
+        imdbId
       };
       this.writeLog({
         event: "SearchTorrent.sendTorrentToClient",
@@ -1215,6 +1235,7 @@ export default Vue.extend({
       new Downloader({
         files: files,
         autoStart: true,
+        tagIMDb: true,
         onCompleted: (file: FileDownloader) => {
           this.downloadTorrentFilesCompleted(file);
         },
@@ -1313,6 +1334,7 @@ export default Vue.extend({
         return;
       }
       let data: SearchResultItem = datas.shift() as SearchResultItem;
+      console.log(data.imdbId)
       this.sendToClient(
         data.url as string,
         data.title,
@@ -1330,7 +1352,8 @@ export default Vue.extend({
           }
           this.sendSelectedToClient(datas, count, downloadOptions);
         },
-        data.link
+        data.link,
+        data.imdbId
       );
     },
     /**
@@ -1493,7 +1516,8 @@ export default Vue.extend({
                   options.title,
                   item,
                   null,
-                  options.link
+                  options.link,
+                  options.imdbId
                 );
               }
             }
@@ -1726,7 +1750,7 @@ export default Vue.extend({
         let end = this.lastCheckedIndex;
         let startIndex = Math.min(start, end);
         let endIndex = Math.max(start, end) + 1;
-        let datas = this.clone(this.datas);
+        let datas = this.clone(this.filteredDatas.length > 0 ? this.filteredDatas : this.datas);
 
         datas = datas.sort(
           this.arrayObjectSort(

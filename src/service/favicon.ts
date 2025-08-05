@@ -91,7 +91,7 @@ export class Favicon {
     return new Promise<any>((resolve?: any, reject?: any) => {
       this.download(`${url}/favicon.ico`)
         .then(result => {
-          if (result && /image/gi.test(result.type)) {
+          if (result && result.size > 0) {
             this.transformBlob(result, "base64")
               .then(base64 => {
                 resolve(this.set(url, base64));
@@ -160,7 +160,7 @@ export class Favicon {
                     if (link.substr(0, 2) === "//") {
                       link = `${URL.protocol}:${link}`;
                     } else if (link.substr(0, 4) !== "http") {
-                      link = `${URL.origin}/${link}`;
+                      link = link.startsWith('/') ? `${URL.origin}${link}` : `${URL.origin}/${link}`;
                     }
 
                     this.download(link)
